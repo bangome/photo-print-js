@@ -1,0 +1,239 @@
+/**
+ * Photo Print JS - UI Styles
+ */
+
+/* Container */
+.photo-print-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+.photo-print-container[data-theme="dark"] {
+  background-color: #1a1a1a;
+}
+
+/* Page */
+.photo-print-page {
+  background-color: #ffffff;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.photo-print-container[data-theme="dark"] .photo-print-page {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Cell */
+.photo-print-cell {
+  position: absolute;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.photo-print-cell--bordered {
+  border: 1px dashed #cccccc;
+}
+
+/* Image Container */
+.photo-print-image-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Image */
+.photo-print-image {
+  display: block;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Page Number */
+.photo-print-page-number {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  font-size: 12px;
+  color: #666666;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.photo-print-container[data-theme="dark"] .photo-print-page-number {
+  color: #999999;
+}
+
+/* Navigation */
+.photo-print-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 15px;
+  padding: 10px;
+}
+
+.photo-print-nav-btn {
+  background: #4a90d9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+  transition: background-color 0.2s;
+}
+
+.photo-print-nav-btn:hover {
+  background: #357abd;
+}
+
+.photo-print-nav-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.photo-print-page-info {
+  font-size: 14px;
+  color: #333333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-width: 60px;
+  text-align: center;
+}
+
+.photo-print-container[data-theme="dark"] .photo-print-page-info {
+  color: #cccccc;
+}
+
+.photo-print-container[data-theme="dark"] .photo-print-nav-btn {
+  background: #3d7dc0;
+}
+
+.photo-print-container[data-theme="dark"] .photo-print-nav-btn:hover {
+  background: #2d6aa8;
+}
+
+/* Print Styles */
+@media print {
+  @page {
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .photo-print-container {
+    padding: 0 !important;
+    background: none !important;
+    gap: 0 !important;
+  }
+
+  .photo-print-page {
+    page-break-after: always;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .photo-print-page:last-child {
+    page-break-after: auto;
+  }
+
+  .photo-print-cell {
+    border: none !important;
+  }
+
+  .photo-print-navigation,
+  .photo-print-page-number {
+    display: none !important;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .photo-print-container {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .photo-print-navigation {
+    gap: 10px;
+  }
+
+  .photo-print-nav-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Animations */
+.photo-print-page {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Empty State */
+.photo-print-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #999999;
+  text-align: center;
+}
+
+.photo-print-empty svg {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.photo-print-empty p {
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Loading State */
+.photo-print-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.photo-print-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #4a90d9;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
