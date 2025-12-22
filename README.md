@@ -18,6 +18,22 @@ A JavaScript library for photo print layouts, similar to Windows Photo Printing 
 npm install photo-print-js
 ```
 
+Or with yarn/pnpm:
+
+```bash
+yarn add photo-print-js
+pnpm add photo-print-js
+```
+
+### CDN
+
+```html
+<script src="https://unpkg.com/photo-print-js@0.1.0/dist/photo-print.iife.js"></script>
+<script>
+  const printer = new PhotoPrint.PhotoPrintLayout({ layout: '2x2' });
+</script>
+```
+
 ## Quick Start
 
 ```typescript
