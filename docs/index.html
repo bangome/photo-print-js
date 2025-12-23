@@ -469,20 +469,37 @@
     initPrinter();
 
     // File upload handlers (label handles click natively)
-    uploadArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadArea.classList.add('dragover');
+    // Prevent default drag behaviors on document
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      document.body.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, false);
     });
 
-    uploadArea.addEventListener('dragleave', () => {
-      uploadArea.classList.remove('dragover');
+    // Highlight drop area when dragging over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+      uploadArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.classList.add('dragover');
+      }, false);
     });
 
+    ['dragleave', 'drop'].forEach(eventName => {
+      uploadArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadArea.classList.remove('dragover');
+      }, false);
+    });
+
+    // Handle dropped files
     uploadArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      uploadArea.classList.remove('dragover');
-      handleFiles(e.dataTransfer.files);
-    });
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      handleFiles(files);
+    }, false);
 
     fileInput.addEventListener('change', (e) => {
       handleFiles(e.target.files);
