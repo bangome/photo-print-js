@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Print JS - Demo</title>
+  <meta name="description" content="JavaScript library for photo print layouts - like Windows Photo Printing Wizard">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #1a1a2e;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px;
+      color: white;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 500px;
+      margin: 0 auto 20px;
+    }
+
+    .badge-container {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255,255,255,0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .main-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    .controls {
+      padding: 30px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .control-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .control-group {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #495057;
+      margin-bottom: 8px;
+    }
+
+    .control-group select,
+    .control-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      background: white;
+      transition: border-color 0.2s;
+    }
+
+    .control-group select:focus,
+    .control-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .upload-area {
+      border: 2px dashed #dee2e6;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .upload-area:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+
+    .upload-area.dragover {
+      border-color: #667eea;
+      background: #ede7f6;
+    }
+
+    .upload-icon {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .upload-text {
+      color: #6c757d;
+      font-size: 0.95rem;
+    }
+
+    .upload-text strong {
+      color: #667eea;
+    }
+
+    .preview-section {
+      padding: 30px;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #preview {
+      width: 100%;
+      max-width: 500px;
+      min-height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .placeholder {
+      text-align: center;
+      color: #adb5bd;
+    }
+
+    .placeholder-icon {
+      font-size: 4rem;
+      margin-bottom: 15px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    .btn-secondary:hover {
+      background: #dee2e6;
+    }
+
+    .image-count {
+      background: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-left: 10px;
+    }
+
+    .thumbnails {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+      justify-content: center;
+    }
+
+    .thumbnail {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid #e9ecef;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .thumbnail:hover {
+      border-color: #667eea;
+      transform: scale(1.05);
+    }
+
+    .thumbnail-wrapper {
+      position: relative;
+    }
+
+    .thumbnail-remove {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .thumbnail-wrapper:hover .thumbnail-remove {
+      opacity: 1;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: white;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .github-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.2);
+      padding: 10px 20px;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      margin-bottom: 15px;
+    }
+
+    /* Photo Print Preview Styles */
+    .photo-print-preview {
+      background: #f0f0f0;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .photo-print-page {
+      background: white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      .control-row {
+        flex-direction: column;
+      }
+
+      .control-group {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Photo Print JS</h1>
+      <p>Arrange photos in grid layouts and print directly from your browser</p>
+      <div class="badge-container">
+        <span class="badge">13 Layouts</span>
+        <span class="badge">7 Paper Sizes</span>
+        <span class="badge">Zero Dependencies</span>
+      </div>
+    </header>
+
+    <div class="main-card">
+      <div class="controls">
+        <div class="control-row">
+          <div class="control-group">
+            <label for="layout">Layout</label>
+            <select id="layout">
+              <option value="full">Full Page (1)</option>
+              <option value="2x1">2-up Horizontal (2)</option>
+              <option value="1x2">2-up Vertical (2)</option>
+              <option value="2x2" selected>4-up Grid (4)</option>
+              <option value="2x3">6-up Vertical (6)</option>
+              <option value="3x2">6-up Horizontal (6)</option>
+              <option value="3x3">9-up Grid (9)</option>
+              <option value="4x4">16-up Grid (16)</option>
+              <option value="4x5">Contact Sheet (20)</option>
+              <option value="wallet">Wallet Size (8)</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="paper">Paper Size</label>
+            <select id="paper">
+              <option value="a4" selected>A4</option>
+              <option value="a5">A5</option>
+              <option value="a3">A3</option>
+              <option value="letter">Letter</option>
+              <option value="legal">Legal</option>
+              <option value="4x6">4x6 Photo</option>
+              <option value="5x7">5x7 Photo</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="fit">Image Fit</label>
+            <select id="fit">
+              <option value="cover" selected>Cover (Fill Cell)</option>
+              <option value="contain">Contain (Fit Inside)</option>
+              <option value="fill">Stretch</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">+</div>
+            <div class="upload-text">
+              <strong>Click to upload</strong> or drag and drop<br>
+              <small>PNG, JPG, WebP supported</small>
+            </div>
+            <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+          </div>
+          <div class="thumbnails" id="thumbnails"></div>
+        </div>
+      </div>
+
+      <div class="preview-section">
+        <div id="preview">
+          <div class="placeholder">
+            <div class="placeholder-icon">+</div>
+            <p>Add photos to see preview</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="printBtn" disabled>
+            Print
+          </button>
+          <button class="btn btn-secondary" id="clearBtn" disabled>
+            Clear All
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <a href="https://github.com/bangome/photo-print-js" class="github-link" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </svg>
+        View on GitHub
+      </a>
+      <p style="opacity: 0.8; font-size: 0.9rem;">
+        Install: <code style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 5px;">npm install photo-print-js</code>
+      </p>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/photo-print-js@0.1.0/dist/photo-print.iife.js"></script>
+  <script>
+    const { PhotoPrintLayout } = PhotoPrint;
+
+    let printer = null;
+    const imageUrls = [];
+
+    // DOM Elements
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const thumbnails = document.getElementById('thumbnails');
+    const preview = document.getElementById('preview');
+    const printBtn = document.getElementById('printBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const layoutSelect = document.getElementById('layout');
+    const paperSelect = document.getElementById('paper');
+    const fitSelect = document.getElementById('fit');
+
+    // Initialize printer
+    function initPrinter() {
+      if (printer) {
+        printer.destroy();
+      }
+
+      printer = new PhotoPrintLayout({
+        layout: layoutSelect.value,
+        paper: { size: paperSelect.value, margins: 10 },
+        imageSettings: { fit: fitSelect.value },
+        debug: false
+      });
+    }
+
+    initPrinter();
+
+    // File upload handlers
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+      fileInput.value = '';
+    });
+
+    async function handleFiles(files) {
+      for (const file of files) {
+        if (file.type.startsWith('image/')) {
+          const url = URL.createObjectURL(file);
+          imageUrls.push(url);
+          await printer.addImage(url);
+          addThumbnail(url, imageUrls.length - 1);
+        }
+      }
+      updatePreview();
+      updateButtons();
+    }
+
+    function addThumbnail(url, index) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'thumbnail-wrapper';
+      wrapper.dataset.index = index;
+
+      const img = document.createElement('img');
+      img.src = url;
+      img.className = 'thumbnail';
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'thumbnail-remove';
+      removeBtn.innerHTML = '&times;';
+      removeBtn.onclick = (e) => {
+        e.stopPropagation();
+        removeImage(index);
+      };
+
+      wrapper.appendChild(img);
+      wrapper.appendChild(removeBtn);
+      thumbnails.appendChild(wrapper);
+    }
+
+    function removeImage(index) {
+      const images = printer.getImages();
+      if (images[index]) {
+        printer.removeImage(images[index].id);
+      }
+      URL.revokeObjectURL(imageUrls[index]);
+      imageUrls.splice(index, 1);
+      rebuildThumbnails();
+      updatePreview();
+      updateButtons();
+    }
+
+    function rebuildThumbnails() {
+      thumbnails.innerHTML = '';
+      imageUrls.forEach((url, index) => addThumbnail(url, index));
+    }
+
+    function updatePreview() {
+      const images = printer.getImages();
+      if (images.length === 0) {
+        preview.innerHTML = `
+          <div class="placeholder">
+            <div class="placeholder-icon">+</div>
+            <p>Add photos to see preview</p>
+          </div>
+        `;
+        return;
+      }
+
+      preview.innerHTML = '';
+      printer.renderPreview({
+        container: preview,
+        showNavigation: true,
+        showPageNumber: true
+      });
+    }
+
+    function updateButtons() {
+      const hasImages = printer.getImages().length > 0;
+      printBtn.disabled = !hasImages;
+      clearBtn.disabled = !hasImages;
+    }
+
+    // Settings change handlers
+    layoutSelect.addEventListener('change', () => {
+      printer.setLayout(layoutSelect.value);
+      updatePreview();
+    });
+
+    paperSelect.addEventListener('change', () => {
+      printer.setPaper({ size: paperSelect.value });
+      updatePreview();
+    });
+
+    fitSelect.addEventListener('change', () => {
+      printer.setImageSettings({ fit: fitSelect.value });
+      updatePreview();
+    });
+
+    // Action buttons
+    printBtn.addEventListener('click', () => {
+      printer.print();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      printer.clearImages();
+      imageUrls.forEach(url => URL.revokeObjectURL(url));
+      imageUrls.length = 0;
+      thumbnails.innerHTML = '';
+      updatePreview();
+      updateButtons();
+    });
+
+    // Add demo images for first-time visitors
+    async function loadDemoImages() {
+      const demoImages = [
+        'https://picsum.photos/seed/photo1/800/600',
+        'https://picsum.photos/seed/photo2/600/800',
+        'https://picsum.photos/seed/photo3/800/800',
+        'https://picsum.photos/seed/photo4/700/500'
+      ];
+
+      for (const url of demoImages) {
+        try {
+          imageUrls.push(url);
+          await printer.addImage(url);
+          addThumbnail(url, imageUrls.length - 1);
+        } catch (e) {
+          console.log('Demo image failed to load:', url);
+        }
+      }
+      updatePreview();
+      updateButtons();
+    }
+
+    // Load demo images on page load
+    loadDemoImages();
+  </script>
+</body>
+</html>

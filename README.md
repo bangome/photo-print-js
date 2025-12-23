@@ -2,6 +2,8 @@
 
 A JavaScript library for photo print layouts, similar to Windows Photo Printing Wizard. Arrange multiple images in various grid layouts and print them or export to PDF.
 
+**[Live Demo](https://bangome.github.io/photo-print-js/)**
+
 ## Features
 
 - **13 Layout Presets**: full, 2x1, 1x2, 2x2, 2x3, 3x2, 3x3, 4x4, 4x5, wallet, 3.5x5, 4x6, 5x7
