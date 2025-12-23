@@ -436,7 +436,9 @@
 
   <script src="https://unpkg.com/photo-print-js@0.1.1/dist/photo-print.iife.js"></script>
   <script>
+    console.log('Script loaded, PhotoPrint:', typeof PhotoPrint);
     const { PhotoPrintLayout } = PhotoPrint;
+    console.log('PhotoPrintLayout:', typeof PhotoPrintLayout);
 
     let printer = null;
     const imageUrls = [];
@@ -468,38 +470,47 @@
 
     initPrinter();
 
-    // File upload handlers (label handles click natively)
-    // Prevent default drag behaviors on document
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      document.body.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }, false);
+    // Drag and drop handlers
+    console.log('Setting up drag/drop on uploadArea:', uploadArea);
+
+    uploadArea.addEventListener('dragenter', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('dragenter');
     });
 
-    // Highlight drop area when dragging over it
-    ['dragenter', 'dragover'].forEach(eventName => {
-      uploadArea.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        uploadArea.classList.add('dragover');
-      }, false);
+    uploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.classList.add('dragover');
     });
 
-    ['dragleave', 'drop'].forEach(eventName => {
-      uploadArea.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        uploadArea.classList.remove('dragover');
-      }, false);
+    uploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.classList.remove('dragover');
+      console.log('dragleave');
     });
 
-    // Handle dropped files
-    uploadArea.addEventListener('drop', (e) => {
-      const dt = e.dataTransfer;
-      const files = dt.files;
-      handleFiles(files);
-    }, false);
+    uploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.classList.remove('dragover');
+      console.log('DROP EVENT!', e.dataTransfer);
+      console.log('Files:', e.dataTransfer.files);
+      console.log('Files length:', e.dataTransfer.files.length);
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFiles(e.dataTransfer.files);
+      }
+    });
+
+    // Also prevent default on document to avoid browser opening the file
+    document.addEventListener('dragover', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('drop', function(e) {
+      e.preventDefault();
+    });
 
     fileInput.addEventListener('change', (e) => {
       handleFiles(e.target.files);
@@ -507,12 +518,20 @@
     });
 
     async function handleFiles(files) {
+      console.log('handleFiles called with', files.length, 'files');
       for (const file of files) {
+        console.log('Processing file:', file.name, file.type);
         if (file.type.startsWith('image/')) {
-          const url = URL.createObjectURL(file);
-          imageUrls.push(url);
-          await printer.addImage(url);
-          addThumbnail(url, imageUrls.length - 1);
+          try {
+            const url = URL.createObjectURL(file);
+            console.log('Created blob URL:', url);
+            imageUrls.push(url);
+            await printer.addImage(url);
+            console.log('Image added successfully');
+            addThumbnail(url, imageUrls.length - 1);
+          } catch (err) {
+            console.error('Error adding image:', err);
+          }
         }
       }
       updatePreview();
