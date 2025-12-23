@@ -147,8 +147,12 @@ export class ImageProcessor {
       // Handle different source types
       switch (source.type) {
         case 'url':
-          img.crossOrigin = 'anonymous';
-          img.src = source.data as string;
+          const url = source.data as string;
+          // Don't set crossOrigin for blob URLs (they don't need CORS)
+          if (!url.startsWith('blob:')) {
+            img.crossOrigin = 'anonymous';
+          }
+          img.src = url;
           break;
 
         case 'base64':

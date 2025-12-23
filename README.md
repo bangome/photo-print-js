@@ -30,7 +30,7 @@ pnpm add photo-print-js
 ### CDN
 
 ```html
-<script src="https://unpkg.com/photo-print-js@0.1.0/dist/photo-print.iife.js"></script>
+<script src="https://unpkg.com/photo-print-js/dist/photo-print.iife.js"></script>
 <script>
   const printer = new PhotoPrint.PhotoPrintLayout({ layout: '2x2' });
 </script>
