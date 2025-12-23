@@ -115,6 +115,7 @@
     }
 
     .upload-area {
+      display: block;
       border: 2px dashed #dee2e6;
       border-radius: 12px;
       padding: 30px;
@@ -389,14 +390,14 @@
         </div>
 
         <div style="margin-top: 20px;">
-          <div class="upload-area" id="uploadArea">
+          <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+          <label for="fileInput" class="upload-area" id="uploadArea">
             <div class="upload-icon">+</div>
             <div class="upload-text">
               <strong>Click to upload</strong> or drag and drop<br>
               <small>PNG, JPG, WebP supported</small>
             </div>
-            <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
-          </div>
+          </label>
           <div class="thumbnails" id="thumbnails"></div>
         </div>
       </div>
@@ -467,9 +468,7 @@
 
     initPrinter();
 
-    // File upload handlers
-    uploadArea.addEventListener('click', () => fileInput.click());
-
+    // File upload handlers (label handles click natively)
     uploadArea.addEventListener('dragover', (e) => {
       e.preventDefault();
       uploadArea.classList.add('dragover');
