@@ -1,6 +1,6 @@
 {
   "name": "photo-print-js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "JavaScript library for photo print layouts - similar to Windows Photo Printing Wizard",
   "type": "module",
   "main": "dist/photo-print.cjs.js",

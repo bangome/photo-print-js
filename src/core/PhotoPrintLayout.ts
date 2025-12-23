@@ -386,21 +386,28 @@ export class PhotoPrintLayout {
   private addPageNavigation(pageCount: number): void {
     if (!this.previewContainer) return;
 
+    // Find the photo-print-container (rendered element)
+    const printContainer = this.previewContainer.querySelector('.photo-print-container');
+    if (!printContainer) return;
+
     const nav = document.createElement('div');
     nav.className = 'photo-print-navigation';
-    nav.style.cssText = 'display: flex; justify-content: center; gap: 10px; margin-top: 10px;';
+    nav.style.cssText = 'display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 8px; padding: 8px 0;';
 
     const prevBtn = document.createElement('button');
-    prevBtn.textContent = '<';
+    prevBtn.textContent = '‹';
     prevBtn.className = 'photo-print-nav-btn';
+    prevBtn.style.cssText = 'width: 32px; height: 32px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;';
 
     const pageInfo = document.createElement('span');
     pageInfo.textContent = `1 / ${pageCount}`;
     pageInfo.className = 'photo-print-page-info';
+    pageInfo.style.cssText = 'font-size: 14px; color: #666; min-width: 50px; text-align: center;';
 
     const nextBtn = document.createElement('button');
-    nextBtn.textContent = '>';
+    nextBtn.textContent = '›';
     nextBtn.className = 'photo-print-nav-btn';
+    nextBtn.style.cssText = 'width: 32px; height: 32px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;';
 
     let currentPage = 0;
     const pages = this.previewContainer.querySelectorAll('.photo-print-page');
@@ -426,7 +433,8 @@ export class PhotoPrintLayout {
     nav.appendChild(pageInfo);
     nav.appendChild(nextBtn);
 
-    this.previewContainer.appendChild(nav);
+    // Insert navigation inside the print container, after the pages
+    printContainer.appendChild(nav);
 
     // Show only first page initially
     updateVisibility();
