@@ -434,19 +434,18 @@
     </footer>
   </div>
 
-  <script src="https://unpkg.com/photo-print-js@0.1.1/dist/photo-print.iife.js"></script>
+  <script src="photo-print.iife.js"></script>
   <script>
     // Prevent browser from opening dropped files
     window.addEventListener('dragover', (e) => e.preventDefault());
     window.addEventListener('drop', (e) => e.preventDefault());
 
     let printer = null;
-    const imageUrls = [];
     let PhotoPrintLayout = null;
 
     // Check if library loaded
-    if (typeof PhotoPrint !== 'undefined' && PhotoPrint.PhotoPrintLayout) {
-      PhotoPrintLayout = PhotoPrint.PhotoPrintLayout;
+    if (typeof PhotoPrintJS !== 'undefined' && PhotoPrintJS.PhotoPrintLayout) {
+      PhotoPrintLayout = PhotoPrintJS.PhotoPrintLayout;
     }
 
     // DOM Elements
@@ -512,16 +511,20 @@
       fileInput.value = '';
     });
 
+    // Store image data with URLs and IDs
+    const imageData = [];
+
     async function handleFiles(files) {
       for (const file of files) {
         if (file.type.startsWith('image/')) {
           try {
             const url = URL.createObjectURL(file);
-            imageUrls.push(url);
+            let imageId = null;
             if (printer) {
-              await printer.addImage(url);
+              imageId = await printer.addImage(url);
             }
-            addThumbnail(url, imageUrls.length - 1);
+            imageData.push({ url, id: imageId });
+            addThumbnail(url, imageId);
           } catch (err) {
             console.error('Error adding image:', err);
           }
@@ -531,10 +534,10 @@
       updateButtons();
     }
 
-    function addThumbnail(url, index) {
+    function addThumbnail(url, imageId) {
       const wrapper = document.createElement('div');
       wrapper.className = 'thumbnail-wrapper';
-      wrapper.dataset.index = index;
+      wrapper.dataset.imageId = imageId;
 
       const img = document.createElement('img');
       img.src = url;
@@ -545,7 +548,7 @@
       removeBtn.innerHTML = '&times;';
       removeBtn.onclick = (e) => {
         e.stopPropagation();
-        removeImage(index);
+        removeImage(imageId);
       };
 
       wrapper.appendChild(img);
@@ -553,24 +556,37 @@
       thumbnails.appendChild(wrapper);
     }
 
-    function removeImage(index) {
-      const images = printer.getImages();
-      if (images[index]) {
-        printer.removeImage(images[index].id);
+    function removeImage(imageId) {
+      // Find and remove from imageData
+      const index = imageData.findIndex(item => item.id === imageId);
+      if (index !== -1) {
+        URL.revokeObjectURL(imageData[index].url);
+        imageData.splice(index, 1);
       }
-      URL.revokeObjectURL(imageUrls[index]);
-      imageUrls.splice(index, 1);
-      rebuildThumbnails();
+      // Remove from printer
+      if (printer && imageId) {
+        printer.removeImage(imageId);
+      }
+      // Remove thumbnail element
+      const wrapper = thumbnails.querySelector(`[data-image-id="${imageId}"]`);
+      if (wrapper) {
+        wrapper.remove();
+      }
       updatePreview();
       updateButtons();
     }
 
-    function rebuildThumbnails() {
-      thumbnails.innerHTML = '';
-      imageUrls.forEach((url, index) => addThumbnail(url, index));
-    }
-
     function updatePreview() {
+      if (!printer) {
+        preview.innerHTML = `
+          <div class="placeholder">
+            <div class="placeholder-icon">!</div>
+            <p>Library not loaded</p>
+          </div>
+        `;
+        return;
+      }
+
       const images = printer.getImages();
       if (images.length === 0) {
         preview.innerHTML = `
@@ -591,7 +607,7 @@
     }
 
     function updateButtons() {
-      const hasImages = printer.getImages().length > 0;
+      const hasImages = printer ? printer.getImages().length > 0 : imageData.length > 0;
       printBtn.disabled = !hasImages;
       clearBtn.disabled = !hasImages;
     }
@@ -618,9 +634,9 @@
     });
 
     clearBtn.addEventListener('click', () => {
-      printer.clearImages();
-      imageUrls.forEach(url => URL.revokeObjectURL(url));
-      imageUrls.length = 0;
+      if (printer) printer.clearImages();
+      imageData.forEach(item => URL.revokeObjectURL(item.url));
+      imageData.length = 0;
       thumbnails.innerHTML = '';
       updatePreview();
       updateButtons();
@@ -637,9 +653,12 @@
 
       for (const url of demoImages) {
         try {
-          imageUrls.push(url);
-          await printer.addImage(url);
-          addThumbnail(url, imageUrls.length - 1);
+          let imageId = null;
+          if (printer) {
+            imageId = await printer.addImage(url);
+          }
+          imageData.push({ url, id: imageId });
+          addThumbnail(url, imageId);
         } catch (e) {
           console.log('Demo image failed to load:', url);
         }
